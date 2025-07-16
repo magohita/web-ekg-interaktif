@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edukasi EKG Interaktif</title>
+    <title>Edukasi EKG Interaktif dengan Analisis AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -37,6 +37,27 @@
         .tab-content.active {
             display: block;
         }
+        /* Styling for AI Uploader */
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.5rem;
+            object-fit: contain;
+            background-color: #f8fafc;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -44,55 +65,72 @@
     <!-- Header -->
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-6 py-4">
-            <h1 class="text-2xl md:text-3xl font-bold text-blue-600">Pendidikan EKG Interaktif</h1>
-            <p class="mt-1 text-gray-600">Meningkatkan Kualitas Interpretasi Klinis oleh Tenaga Kesehatan</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-blue-600">Pendidikan EKG dengan Analisis AI</h1>
+            <p class="mt-1 text-gray-600">Simulasi, Kuis, dan Analisis Gambar EKG Berbasis AI</p>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="container mx-auto px-6 py-8">
         
-        <!-- Introduction Section -->
-        <section id="pendahuluan" class="mb-12">
-            <div class="card p-6">
-                <h2 class="text-2xl font-bold mb-4 text-gray-800">Selamat Datang!</h2>
-                <p class="text-gray-700 leading-relaxed">
-                    Interpretasi elektrokardiogram (EKG) adalah kompetensi klinis krusial untuk deteksi dini gangguan irama jantung. Namun, banyak tenaga kesehatan menghadapi kesulitan karena terbatasnya waktu pelatihan. Platform web interaktif ini dirancang sebagai solusi pembelajaran yang fleksibel dan mandiri. Melalui simulasi, kuis, dan studi kasus, kami berharap dapat meningkatkan akurasi, kecepatan, dan kepercayaan diri Anda dalam mengambil keputusan klinis terkait EKG.
-                </p>
-            </div>
-        </section>
-
         <!-- Interactive Learning Section -->
         <section id="pembelajaran">
             <div class="card">
                 <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex space-x-6 px-6" aria-label="Tabs">
-                        <button onclick="changeTab(event, 'simulasi')" class="tab-button active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    <nav class="-mb-px flex space-x-2 md:space-x-6 px-4 md:px-6 overflow-x-auto" aria-label="Tabs">
+                        <button onclick="changeTab(event, 'analisis')" class="tab-button active whitespace-nowrap py-4 px-2 md:px-4 border-b-2 font-medium text-sm">
+                            Analisis AI
+                        </button>
+                        <button onclick="changeTab(event, 'simulasi')" class="tab-button whitespace-nowrap py-4 px-2 md:px-4 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                             Simulasi EKG
                         </button>
-                        <button onclick="changeTab(event, 'materi')" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <button onclick="changeTab(event, 'materi')" class="tab-button whitespace-nowrap py-4 px-2 md:px-4 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                             Materi Dasar
                         </button>
-                        <button onclick="changeTab(event, 'kuis')" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <button onclick="changeTab(event, 'kuis')" class="tab-button whitespace-nowrap py-4 px-2 md:px-4 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                             Kuis Interaktif
                         </button>
                     </nav>
                 </div>
 
+                <!-- Tab: AI Analysis -->
+                <div id="analisis" class="tab-content active p-6">
+                    <h3 class="text-xl font-bold mb-2">Analisis Gambar EKG dengan AI</h3>
+                    <p class="mb-4 text-gray-600">Unggah gambar EKG Anda (format .jpg, .png) dan biarkan AI membantu menganalisisnya. Hasil analisis hanya untuk tujuan edukasi.</p>
+                    
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <div class="mb-4">
+                            <label for="ekgUploader" class="block mb-2 text-sm font-medium text-gray-900">Pilih file gambar:</label>
+                            <input type="file" id="ekgUploader" accept="image/jpeg, image/png" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                        </div>
+
+                        <div id="imagePreviewContainer" class="mb-4 text-center p-4 min-h-[150px] flex items-center justify-center">
+                            <span class="text-gray-500">Pratinjau gambar akan muncul di sini</span>
+                        </div>
+                        
+                        <button id="analyzeBtn" class="btn w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                            Analisis Gambar
+                        </button>
+                    </div>
+
+                    <div id="aiResultContainer" class="mt-6 hidden">
+                        <h4 class="text-lg font-bold mb-2">Hasil Analisis AI:</h4>
+                        <div id="loader" class="loader mx-auto my-4"></div>
+                        <div id="aiResultText" class="p-4 bg-blue-50 border border-blue-200 text-blue-900 rounded-lg whitespace-pre-wrap leading-relaxed"></div>
+                    </div>
+                </div>
+
                 <!-- Tab: EKG Simulation -->
-                <div id="simulasi" class="tab-content active p-6">
+                <div id="simulasi" class="tab-content p-6">
                     <h3 class="text-xl font-bold mb-2">Simulasi EKG Interaktif</h3>
                     <p class="mb-4 text-gray-600">Pilih jenis irama jantung untuk melihat simulasinya secara langsung.</p>
-                    
                     <div class="bg-green-900 border-4 border-gray-700 rounded-lg p-2 mb-4">
                         <canvas id="ekgCanvas"></canvas>
                     </div>
-
                     <div id="ekg-info" class="text-center mb-4 p-3 bg-blue-100 text-blue-800 rounded-lg">
                         <p class="font-semibold text-lg" id="rhythmName">Normal Sinus Rhythm</p>
                         <p class="text-sm" id="rhythmDesc">Irama jantung normal, berkisar antara 60-100 denyut per menit.</p>
                     </div>
-
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <button onclick="setRhythm('normal')" class="btn bg-green-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-green-600">Normal Sinus</button>
                         <button onclick="setRhythm('tachycardia')" class="btn bg-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-orange-600">Tachycardia</button>
@@ -105,7 +143,7 @@
                 <div id="materi" class="tab-content p-6">
                     <h3 class="text-xl font-bold mb-4">Dasar-Dasar Interpretasi EKG</h3>
                     <div class="space-y-6">
-                        <div>
+                         <div>
                             <h4 class="font-semibold text-lg">Gelombang Normal EKG</h4>
                             <img src="https://placehold.co/600x200/e2e8f0/4a5568?text=Gelombang+EKG+Normal+(P-QRS-T)" alt="Gelombang EKG Normal" class="w-full max-w-lg mx-auto my-4 rounded-lg bg-gray-200">
                             <p class="text-gray-700">Satu siklus detak jantung pada EKG terdiri dari beberapa komponen utama:</p>
@@ -119,22 +157,44 @@
                             <h4 class="font-semibold text-lg">Kertas EKG</h4>
                             <p class="text-gray-700">Kertas EKG memiliki grid standar. Satu kotak kecil berukuran 1 mm dan mewakili 0.04 detik (sumbu horizontal) dan 0.1 mV (sumbu vertikal). Satu kotak besar (5x5 kotak kecil) mewakili 0.20 detik.</p>
                         </div>
+                        
+                        <!-- BAGIAN YANG DIPERBAIKI DAN DITAMBAHKAN KEMBALI -->
+                        <div class="mt-8 pt-6 border-t">
+                            <h3 class="text-xl font-bold mb-4">Contoh Irama Jantung (Gambar Statis)</h3>
+                            
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-lg">1. Normal Sinus Rhythm</h4>
+                                <img src="https://placehold.co/600x150/e2e8f0/4a5568?text=Contoh+Normal+Sinus+Rhythm" alt="Contoh Normal Sinus Rhythm" class="w-full max-w-lg mx-auto my-4 rounded-lg bg-gray-200">
+                                <p class="text-gray-700">Irama jantung normal, berkisar antara 60-100 denyut per menit dengan ritme yang teratur.</p>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-lg">2. Tachycardia</h4>
+                                <img src="https://placehold.co/600x150/e2e8f0/4a5568?text=Contoh+Tachycardia" alt="Contoh Tachycardia" class="w-full max-w-lg mx-auto my-4 rounded-lg bg-gray-200">
+                                <p class="text-gray-700">Detak jantung lebih cepat dari normal, yaitu di atas 100 denyut per menit.</p>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-lg">3. Bradycardia</h4>
+                                <img src="https://placehold.co/600x150/e2e8f0/4a5568?text=Contoh+Bradycardia" alt="Contoh Bradycardia" class="w-full max-w-lg mx-auto my-4 rounded-lg bg-gray-200">
+                                <p class="text-gray-700">Detak jantung lebih lambat dari normal, yaitu di bawah 60 denyut per menit.</p>
+                            </div>
+
+                             <div class="mb-6">
+                                <h4 class="font-semibold text-lg">4. Atrial Fibrillation</h4>
+                                <img src="https://placehold.co/600x150/e2e8f0/4a5568?text=Contoh+Atrial+Fibrillation" alt="Contoh Atrial Fibrillation" class="w-full max-w-lg mx-auto my-4 rounded-lg bg-gray-200">
+                                <p class="text-gray-700">Irama jantung tidak teratur dan seringkali cepat (dikenal sebagai irregularly irregular).</p>
+                            </div>
+                        </div>
+                        <!-- AKHIR DARI BAGIAN YANG DIPERBAIKI -->
+
                     </div>
                 </div>
 
                 <!-- Tab: Interactive Quiz -->
                 <div id="kuis" class="tab-content p-6">
-                    <h3 class="text-xl font-bold mb-4">Kuis: Identifikasi Irama Jantung</h3>
                     <div id="quiz-container">
-                        <p class="mb-4 text-gray-600">Amati simulasi EKG di bawah ini dan tentukan jenis irama jantungnya.</p>
-                        <div class="bg-green-900 border-4 border-gray-700 rounded-lg p-2 mb-4">
-                            <canvas id="quizEkgCanvas"></canvas>
-                        </div>
-                        <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <!-- Options will be generated by JS -->
-                        </div>
-                        <div id="quiz-feedback" class="mt-4 p-3 rounded-lg text-center font-semibold hidden"></div>
-                        <button id="next-question-btn" onclick="nextQuestion()" class="btn mt-4 w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 hidden">Pertanyaan Berikutnya</button>
+                        <!-- Quiz content generated by JS -->
                     </div>
                 </div>
             </div>
@@ -162,12 +222,8 @@
             document.getElementById(tabID).classList.add('active');
             event.currentTarget.classList.add('active');
 
-            // Re-initialize canvases if they are now visible
-            if (tabID === 'simulasi') {
-                initCanvas('ekgCanvas', 'normal');
-            } else if (tabID === 'kuis') {
-                startQuiz();
-            }
+            if (tabID === 'simulasi') initCanvas('ekgCanvas', currentRhythm);
+            if (tabID === 'kuis') startQuiz();
         }
 
         // --- EKG Simulation Logic ---
@@ -178,104 +234,46 @@
         let x = 0;
 
         const rhythms = {
-            normal: {
-                name: 'Normal Sinus Rhythm',
-                desc: 'Irama jantung normal, berkisar antara 60-100 denyut per menit.',
-                speed: 1.5,
-                pattern: [0,0,0,0,0, 5,10,5,0, -5,-15,-5,0, 50, -90, 40, -10, 5, 0, 10, 20, 25, 20, 10, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-            },
-            tachycardia: {
-                name: 'Tachycardia',
-                desc: 'Detak jantung lebih cepat dari normal, >100 denyut per menit.',
-                speed: 3,
-                pattern: [0,0, 5,10,5,0, -5,-15,-5,0, 50, -90, 40, -10, 5, 0, 10, 20, 25, 20, 10, 0,0,0,0,0,0,0,0,0,0]
-            },
-            bradycardia: {
-                name: 'Bradycardia',
-                desc: 'Detak jantung lebih lambat dari normal, <60 denyut per menit.',
-                speed: 0.8,
-                pattern: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 5,10,5,0, -5,-15,-5,0, 50, -90, 40, -10, 5, 0, 10, 20, 25, 20, 10, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-            },
-            afib: {
-                name: 'Atrial Fibrillation',
-                desc: 'Irama jantung tidak teratur dan seringkali cepat (irregularly irregular).',
-                speed: 2.5,
-                pattern: [0, 5, -3, 8, -5, 5, 0, 40, -70, 30, 0, 5, -2, 6, -4, 0, 0, 0, 5, -3, 4, 0, 30, -60, 25, 0, 0, 6, -2, 8, -5, 0, 50, -95, 45, 0]
-            }
+            normal: { name: 'Normal Sinus Rhythm', desc: 'Irama jantung normal, berkisar antara 60-100 denyut per menit.', speed: 1.5, pattern: [0,0,0,0,0, 5,10,5,0, -5,-15,-5,0, 50, -90, 40, -10, 5, 0, 10, 20, 25, 20, 10, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+            tachycardia: { name: 'Tachycardia', desc: 'Detak jantung lebih cepat dari normal, >100 denyut per menit.', speed: 3, pattern: [0,0, 5,10,5,0, -5,-15,-5,0, 50, -90, 40, -10, 5, 0, 10, 20, 25, 20, 10, 0,0,0,0,0,0,0,0,0,0] },
+            bradycardia: { name: 'Bradycardia', desc: 'Detak jantung lebih lambat dari normal, <60 denyut per menit.', speed: 0.8, pattern: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 5,10,5,0, -5,-15,-5,0, 50, -90, 40, -10, 5, 0, 10, 20, 25, 20, 10, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+            afib: { name: 'Atrial Fibrillation', desc: 'Irama jantung tidak teratur dan seringkali cepat (irregularly irregular).', speed: 2.5, pattern: [0, 5, -3, 8, -5, 5, 0, 40, -70, 30, 0, 5, -2, 6, -4, 0, 0, 0, 5, -3, 4, 0, 30, -60, 25, 0, 0, 6, -2, 8, -5, 0, 50, -95, 45, 0] }
         };
 
         function drawGrid(canvasElement, context) {
             const width = canvasElement.width;
             const height = canvasElement.height;
             context.clearRect(0, 0, width, height);
-            context.strokeStyle = '#38a169'; // Darker green for grid
+            context.strokeStyle = '#38a169';
             context.lineWidth = 0.5;
-
-            // Minor grid lines
-            for (let i = 0; i < width; i += 5) {
-                context.beginPath();
-                context.moveTo(i, 0);
-                context.lineTo(i, height);
-                context.stroke();
-            }
-            for (let i = 0; i < height; i += 5) {
-                context.beginPath();
-                context.moveTo(0, i);
-                context.lineTo(width, i);
-                context.stroke();
-            }
-
-            // Major grid lines
-            context.strokeStyle = '#4a5568'; // A bit more prominent
+            for (let i = 0; i < width; i += 5) { context.beginPath(); context.moveTo(i, 0); context.lineTo(i, height); context.stroke(); }
+            for (let i = 0; i < height; i += 5) { context.beginPath(); context.moveTo(0, i); context.lineTo(width, i); context.stroke(); }
+            context.strokeStyle = '#4a5568';
             context.lineWidth = 1;
-            for (let i = 0; i < width; i += 25) {
-                context.beginPath();
-                context.moveTo(i, 0);
-                context.lineTo(i, height);
-                context.stroke();
-            }
-            for (let i = 0; i < height; i += 25) {
-                context.beginPath();
-                context.moveTo(0, i);
-                context.lineTo(width, i);
-                context.stroke();
-            }
+            for (let i = 0; i < width; i += 25) { context.beginPath(); context.moveTo(i, 0); context.lineTo(i, height); context.stroke(); }
+            for (let i = 0; i < height; i += 25) { context.beginPath(); context.moveTo(0, i); context.lineTo(width, i); context.stroke(); }
         }
 
         function animateEKG(canvasElement, context, rhythmKey) {
-            const rhythmData = rhythms[rhythmKey];
-            const pattern = rhythmData.pattern;
-            const speed = rhythmData.speed;
-            const width = canvasElement.width;
-            const height = canvasElement.height;
-            const centerY = height / 2;
-
+            const { pattern, speed } = rhythms[rhythmKey];
+            const width = canvasElement.width, height = canvasElement.height, centerY = height / 2;
             function loop() {
-                // Get the image data of the last frame
                 const imageData = context.getImageData(speed, 0, width - speed, height);
-                // Redraw grid on the cleared part
                 drawGrid(canvasElement, context);
-                // Put the shifted image back
                 context.putImageData(imageData, 0, 0);
-
-                // Draw the new line segment on the right
                 const patternIndex = Math.floor(x / speed) % pattern.length;
                 const prevPatternIndex = (patternIndex === 0) ? pattern.length - 1 : patternIndex - 1;
-                
                 const y1 = centerY - pattern[prevPatternIndex] * (height / 400);
                 const y2 = centerY - pattern[patternIndex] * (height / 400);
-
                 context.beginPath();
                 context.moveTo(width - speed, y1);
                 context.lineTo(width, y2);
-                context.strokeStyle = '#68d391'; // Bright green for EKG line
+                context.strokeStyle = '#68d391';
                 context.lineWidth = 2.5;
                 context.stroke();
-                
                 x += speed;
                 animationFrameId = requestAnimationFrame(loop);
             }
-
             cancelAnimationFrame(animationFrameId);
             loop();
         }
@@ -292,11 +290,9 @@
             const canvasEl = document.getElementById(canvasId);
             if (!canvasEl) return;
             const ctxEl = canvasEl.getContext('2d');
-            
             const container = canvasEl.parentElement;
             canvasEl.width = container.clientWidth;
             canvasEl.height = container.clientHeight > 0 ? container.clientHeight : 200;
-
             x = 0;
             cancelAnimationFrame(animationFrameId);
             drawGrid(canvasEl, ctxEl);
@@ -304,10 +300,6 @@
         }
 
         // --- Quiz Logic ---
-        const quizCanvas = document.getElementById('quizEkgCanvas');
-        const quizCtx = quizCanvas.getContext('2d');
-        let quizAnimationId;
-
         const quizQuestions = [
             { rhythm: 'tachycardia', options: ['Normal Sinus', 'Tachycardia', 'Bradycardia', 'Atrial Fibrillation'], answer: 'Tachycardia' },
             { rhythm: 'bradycardia', options: ['Bradycardia', 'Tachycardia', 'Normal Sinus', 'Atrial Fibrillation'], answer: 'Bradycardia' },
@@ -316,25 +308,32 @@
         ];
         let currentQuestionIndex = 0;
         let score = 0;
+        let quizAnimationId;
 
         function startQuiz() {
             currentQuestionIndex = 0;
             score = 0;
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = `
+                <h3 class="text-xl font-bold mb-4">Kuis: Identifikasi Irama Jantung</h3>
+                <p class="mb-4 text-gray-600">Amati simulasi EKG di bawah ini dan tentukan jenis irama jantungnya.</p>
+                <div class="bg-green-900 border-4 border-gray-700 rounded-lg p-2 mb-4">
+                    <canvas id="quizEkgCanvas"></canvas>
+                </div>
+                <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+                <div id="quiz-feedback" class="mt-4 p-3 rounded-lg text-center font-semibold hidden"></div>
+                <button id="next-question-btn" onclick="nextQuestion()" class="btn mt-4 w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 hidden">Pertanyaan Berikutnya</button>
+            `;
             loadQuestion();
         }
 
         function loadQuestion() {
             const question = quizQuestions[currentQuestionIndex];
             const optionsContainer = document.getElementById('quiz-options');
-            const feedbackEl = document.getElementById('quiz-feedback');
-            const nextBtn = document.getElementById('next-question-btn');
-
-            feedbackEl.classList.add('hidden');
-            nextBtn.classList.add('hidden');
             optionsContainer.innerHTML = '';
-
-            // Animate quiz EKG
+            
             const canvasEl = document.getElementById('quizEkgCanvas');
+            const quizCtx = canvasEl.getContext('2d');
             const container = canvasEl.parentElement;
             canvasEl.width = container.clientWidth;
             canvasEl.height = 200;
@@ -342,53 +341,36 @@
             
             let quizX = 0;
             function animateQuizEKG() {
-                const rhythmData = rhythms[question.rhythm];
-                const pattern = rhythmData.pattern;
-                const speed = rhythmData.speed;
-                const width = canvasEl.width;
-                const height = canvasEl.height;
-                const centerY = height / 2;
-
+                const { pattern, speed } = rhythms[question.rhythm];
+                const width = canvasEl.width, height = canvasEl.height, centerY = height / 2;
                 const imageData = quizCtx.getImageData(speed, 0, width - speed, height);
                 drawGrid(canvasEl, quizCtx);
                 quizCtx.putImageData(imageData, 0, 0);
-
                 const patternIndex = Math.floor(quizX / speed) % pattern.length;
                 const prevPatternIndex = (patternIndex === 0) ? pattern.length - 1 : patternIndex - 1;
-                
                 const y1 = centerY - pattern[prevPatternIndex] * (height / 400);
                 const y2 = centerY - pattern[patternIndex] * (height / 400);
-
-                quizCtx.beginPath();
-                quizCtx.moveTo(width - speed, y1);
-                quizCtx.lineTo(width, y2);
-                quizCtx.strokeStyle = '#68d391';
-                quizCtx.lineWidth = 2.5;
-                quizCtx.stroke();
-                
+                quizCtx.beginPath(); quizCtx.moveTo(width - speed, y1); quizCtx.lineTo(width, y2); quizCtx.strokeStyle = '#68d391'; quizCtx.lineWidth = 2.5; quizCtx.stroke();
                 quizX += speed;
                 quizAnimationId = requestAnimationFrame(animateQuizEKG);
             }
             animateQuizEKG();
 
-            // Create option buttons
             question.options.forEach(option => {
                 const button = document.createElement('button');
                 button.innerText = option;
-                button.classList.add('btn', 'bg-gray-200', 'text-gray-800', 'font-semibold', 'py-3', 'px-4', 'rounded-lg', 'hover:bg-gray-300');
+                button.className = 'btn bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300';
                 button.onclick = () => checkAnswer(option);
                 optionsContainer.appendChild(button);
             });
         }
 
         function checkAnswer(selectedOption) {
-            cancelAnimationFrame(quizAnimationId); // Stop animation on answer
+            cancelAnimationFrame(quizAnimationId);
             const question = quizQuestions[currentQuestionIndex];
             const feedbackEl = document.getElementById('quiz-feedback');
             const nextBtn = document.getElementById('next-question-btn');
-            
             document.querySelectorAll('#quiz-options button').forEach(btn => btn.disabled = true);
-
             if (selectedOption === question.answer) {
                 feedbackEl.innerText = 'Benar! Ini adalah ' + question.answer;
                 feedbackEl.className = 'mt-4 p-3 rounded-lg text-center font-semibold bg-green-100 text-green-800';
@@ -399,15 +381,14 @@
             }
             feedbackEl.classList.remove('hidden');
             nextBtn.classList.remove('hidden');
-            
-            if (currentQuestionIndex === quizQuestions.length - 1) {
-                nextBtn.innerText = 'Lihat Hasil';
-            }
+            if (currentQuestionIndex === quizQuestions.length - 1) nextBtn.innerText = 'Lihat Hasil';
         }
 
         function nextQuestion() {
             currentQuestionIndex++;
             if (currentQuestionIndex < quizQuestions.length) {
+                document.getElementById('quiz-feedback').classList.add('hidden');
+                document.getElementById('next-question-btn').classList.add('hidden');
                 loadQuestion();
             } else {
                 showResults();
@@ -424,16 +405,94 @@
                 </div>
             `;
         }
+        
+        // --- AI Analysis Logic ---
+        const ekgUploader = document.getElementById('ekgUploader');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const aiResultContainer = document.getElementById('aiResultContainer');
+        const aiResultText = document.getElementById('aiResultText');
+        const loader = document.getElementById('loader');
+        let fileBase64 = null;
+
+        ekgUploader.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreviewContainer.innerHTML = `<img src="${e.target.result}" alt="Pratinjau EKG" id="imagePreview">`;
+                    fileBase64 = e.target.result.split(',')[1]; // Get Base64 part
+                    analyzeBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+                aiResultContainer.classList.add('hidden');
+            }
+        });
+
+        analyzeBtn.addEventListener('click', async () => {
+            if (!fileBase64) {
+                alert("Silakan pilih file gambar terlebih dahulu.");
+                return;
+            }
+
+            aiResultContainer.classList.remove('hidden');
+            loader.style.display = 'block';
+            aiResultText.style.display = 'none';
+            analyzeBtn.disabled = true;
+
+            const prompt = `Anda adalah asisten pendidikan medis ahli dalam interpretasi EKG. Analisis gambar EKG ini. Identifikasi kemungkinan jenis irama jantung (misalnya, Normal Sinus Rhythm, Sinus Tachycardia, Sinus Bradycardia, atau Atrial Fibrillation). Berikan ringkasan singkat tentang karakteristik kunci yang Anda lihat pada gambar yang mendukung kesimpulan Anda (misalnya, kecepatan, ritme, keberadaan gelombang P, interval PR, lebar QRS). PENTING: Mulai jawaban Anda dengan disclaimer berikut dalam huruf tebal: '**ANALISIS INI HANYA UNTUK TUJUAN EDUKASI DAN TIDAK MENGGANTIKAN DIAGNOSIS MEDIS PROFESIONAL.**'`;
+
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: prompt },
+                        { inline_data: { mime_type: "image/jpeg", data: fileBase64 } }
+                    ]
+                }]
+            };
+
+            const apiKey = ""; // API key is handled by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                let analysis = "Tidak dapat menganalisis gambar. Silakan coba lagi.";
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    analysis = result.candidates[0].content.parts[0].text;
+                }
+                aiResultText.innerText = analysis;
+
+            } catch (error) {
+                console.error("Error during AI analysis:", error);
+                aiResultText.innerText = "Terjadi kesalahan saat menghubungi layanan AI. Pastikan koneksi internet Anda stabil dan coba lagi.";
+            } finally {
+                loader.style.display = 'none';
+                aiResultText.style.display = 'block';
+                analyzeBtn.disabled = false;
+            }
+        });
+
 
         // --- Initial Load ---
         window.addEventListener('DOMContentLoaded', () => {
-            initCanvas('ekgCanvas', 'normal');
+            startQuiz(); // Initialize quiz tab content
+            changeTab({ currentTarget: document.querySelector('.tab-button.active') }, 'analisis');
             window.addEventListener('resize', () => {
                 if(document.getElementById('simulasi').classList.contains('active')) {
                     initCanvas('ekgCanvas', currentRhythm);
-                }
-                if(document.getElementById('kuis').classList.contains('active')) {
-                   // Quiz canvas will resize on next question
                 }
             });
         });
@@ -441,3 +500,4 @@
 
 </body>
 </html>
+
